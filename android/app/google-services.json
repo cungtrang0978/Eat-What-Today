@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "559282802968",
+    "firebase_url": "https://eat-what-today.firebaseio.com",
+    "project_id": "eat-what-today",
+    "storage_bucket": "eat-what-today.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559282802968:android:a60dd52b2238d256b08e6d",
+        "android_client_info": {
+          "package_name": "com.example.flutter_eat_what_today"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559282802968-fmq6val2ggf5g9ibdlg022etltd3fapg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRGIbowZBHxPlFl-CsVUbcOX-NFzBpD3U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559282802968-fmq6val2ggf5g9ibdlg022etltd3fapg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
