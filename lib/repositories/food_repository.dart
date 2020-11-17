@@ -11,7 +11,6 @@ class FoodRepository {
   FoodRepository();
 
   Future<void> insertFood(Food food) async {
-
     final foodRef = firebaseFirestore.collection('foods');
     foodRef
         .doc("1231456")
@@ -21,12 +20,8 @@ class FoodRepository {
   Future<void> getFood() async {
     print("getfood");
     final foodRef = firebaseFirestore.collection('foods');
-    foodRef.doc("XIhilfg0TxJO4MDjjmIH").get().then((value) {
-      // final food = Food(name: value.get('name'), createdAt: value.get('createdAt'), createdBy: value.get('createdBy'), imageUrl: value.get('imageUrl'));
-      // print(food);
-      final food = Food.fromCollection(value);
-      print(food);
-      // print(value.get('createdAt'));
-    });
+    DocumentSnapshot foodSnapshot = await foodRef.doc('adad').get();
+    final food = Food.fromJson(foodSnapshot.data());
+    print(food);
   }
 }

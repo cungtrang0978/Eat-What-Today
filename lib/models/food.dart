@@ -21,12 +21,15 @@ class Food {
     return 'Food{fid: $fid, name: $name, imageUrl: $imageUrl, createdAt: $createdAt, modifiedAt: $modifiedAt, createdBy: $createdBy}';
   }
 
-  Food.fromCollection(value) {
-    name = value.get('name') ?? '';
-    imageUrl = value.get('imageUrl') ?? '';
-    createdAt = convertFromTimestamp(value.get('createdAt')) ?? DateTime.now();
-    modifiedAt = value.get('modifiedAt') ?? null;
-    createdBy = value.get('createdBy') ?? '';
+
+
+  Food.fromJson(Map<String, dynamic> json){
+    name = json['name']??'';
+    imageUrl = json['imageUrl']??'';
+    createdAt = convertFromTimestamp(json['createdAt'])?? DateTime.now();
+    modifiedAt = json['modifiedAt']??null;
+    createdBy = json['createdBy']??'';
+
   }
 
   DateTime convertFromTimestamp(Timestamp timestamp) {
