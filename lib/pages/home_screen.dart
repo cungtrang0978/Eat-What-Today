@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/authentication_bloc.dart';
 import 'package:flutter_eat_what_today/events/authentication_event.dart';
+import 'package:flutter_eat_what_today/pages/food_addition_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -25,6 +26,26 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        body: ListView());
+        body: Column(
+          children: [
+            Row(
+              children: [
+                FlatButton(
+                  child: Text('Add Food'),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FoodAdditionScreen()));
+                  },
+                ),
+                FlatButton(
+                  child: Text('Add Meal'),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ],
+        ));
   }
 }

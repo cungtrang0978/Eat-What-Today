@@ -2,6 +2,7 @@ import 'package:flutter_eat_what_today/blocs/authentication_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/login_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/simple_bloc_observer.dart';
 import 'package:flutter_eat_what_today/events/authentication_event.dart';
+import 'package:flutter_eat_what_today/models/food.dart';
 import 'package:flutter_eat_what_today/pages/home_screen.dart';
 import 'package:flutter_eat_what_today/pages/test_calendar_screen.dart';
 import 'package:flutter_eat_what_today/pages/login_page.dart';
