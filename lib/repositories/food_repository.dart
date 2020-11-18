@@ -8,6 +8,7 @@ class FoodRepository {
       FirebaseFirestore.instance.collection('foods');
   String userId;
 
+
   // FoodRepository({@required this.userId}) : assert(userId != null);
   FoodRepository();
 
@@ -15,19 +16,21 @@ class FoodRepository {
     foodsRef.add(food.toJson());
   }
 
-  Future<void> getFood(String fid) async {
+  Future<Food> getFood(String fid) async {
     DocumentSnapshot foodSnapshot = await foodsRef.doc(fid).get();
     final food = Food.fromJson(foodSnapshot.data());
-    print(food);
+    return food;
   }
 
-  Future<void> getFoods() async {
+  Future<List<Food>> getFoods() async {
+    List<Food> foods = List<Food>();
+
     QuerySnapshot querySnapshot = await foodsRef.get();
     querySnapshot.docs.forEach((foodDoc) {
-
       Food food = Food.fromJson(foodDoc.data());
       food.fid = foodDoc.id;
-      print(food);
+      foods.add(food);
     });
+    return foods;
   }
 }

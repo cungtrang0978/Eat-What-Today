@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_eat_what_today/models/food.dart';
 import 'package:flutter_eat_what_today/repositories/food_repository.dart';
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 
 class FoodAdditionScreen extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class FoodAdditionScreen extends StatefulWidget {
 
 class _FoodAdditionScreenState extends State<FoodAdditionScreen> {
   TextEditingController nameController;
+  GlobalKey<AutoCompleteTextFieldState<Food>> key = new GlobalKey();
 
   @override
   void initState() {
@@ -29,16 +31,72 @@ class _FoodAdditionScreenState extends State<FoodAdditionScreen> {
           Padding(
             padding: EdgeInsets.all(10),
             child: TextField(
-              controller: nameController,
-            ),
+                // controller: nameController,
+                ),
           ),
-          FlatButton(onPressed: () {
-            // if(nameController.text.isNotEmpty){
-            //   final food = Food(name: nameController.text, createdBy: "Thang", createdAt: DateTime.now());
-            //   FoodRepository().insertFood(food);
-            // }
-            FoodRepository().getFoods();
-          }, child: Text('Insert Food'),)
+          AutoCompleteTextField<Food>(
+            key: key,
+            controller: nameController,
+            suggestions: [
+              Food(name: "Sautatca"),
+              Food(name: "May muon go"),
+              Food(name: "Anh la ai"),
+              Food(name: "Anh khong biet dau"),
+              Food(name: "Anh yeu em"),
+              Food(name: "Anh la cua em"),
+              Food(name: "Em la cua anh"),
+
+            ],
+            suggestionsAmount: 100,
+            style: TextStyle(color: Colors.black, fontSize: 16.0),
+            decoration: InputDecoration(
+              suffixIcon: Container(
+                width: 85.0,
+                height: 60.0,
+              ),
+              contentPadding: EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
+              filled: true,
+              hintText: 'Search Player Name',
+              hintStyle: TextStyle(color: Colors.black),
+            ),
+            clearOnSubmit: false,
+            itemBuilder: (context, food) {
+              return Padding(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      food.name,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ],
+                ),
+              );
+            },
+            itemSorter: (a, b) {
+              return a.name.compareTo(b.name);
+            },
+            itemFilter: (food, query) {
+              return food.name.toLowerCase().contains(query.toLowerCase());
+            },
+            itemSubmitted: (food) {
+              setState(() {
+                nameController.text = food.name;
+                print(food);
+              });
+            },
+          ),
+          FlatButton(
+            onPressed: () {
+              // if(nameController.text.isNotEmpty){
+              //   final food = Food(name: nameController.text, createdBy: "Thang", createdAt: DateTime.now());
+              //   FoodRepository().insertFood(food);
+              // }
+              FoodRepository().getFoods();
+            },
+            child: Text('Insert Food'),
+          )
         ],
       ),
     );
