@@ -48,6 +48,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }catch(_) {
         yield LoginState.failure();
       }
+    }else if(loginEvent is LoginEventStarted){
+      yield LoginState.initial();
     }
   }
 }

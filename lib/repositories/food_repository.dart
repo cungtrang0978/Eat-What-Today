@@ -2,17 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_eat_what_today/models/food.dart';
+import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 
 class FoodRepository {
   final CollectionReference foodsRef =
       FirebaseFirestore.instance.collection('foods');
-  String userId;
 
+  final UserRepository userRepository;
 
-  // FoodRepository({@required this.userId}) : assert(userId != null);
-  FoodRepository();
+  FoodRepository({@required this.userRepository})
+      : assert(userRepository != null);
 
   Future<void> insertFood(Food food) async {
+    final user = await userRepository.getUser();
+    food.createdBy = user.uid;
     foodsRef.add(food.toJson());
   }
 

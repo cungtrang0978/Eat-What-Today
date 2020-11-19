@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_eat_what_today/blocs/authentication_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/foods_bloc.dart';
 import 'package:flutter_eat_what_today/events/foods_event.dart';
 import 'package:flutter_eat_what_today/models/food.dart';
 import 'package:flutter_eat_what_today/pages/food_addition_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 import 'package:flutter_eat_what_today/states/foods_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,14 +16,13 @@ class FoodsScreen extends StatefulWidget {
 }
 
 class _FoodsScreenState extends State<FoodsScreen> {
-
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     BlocProvider.of<FoodsBloc>(context).add(FoodsEventRequested());
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +36,7 @@ class _FoodsScreenState extends State<FoodsScreen> {
           ),
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: (){
+            onPressed: () {
               BlocProvider.of<FoodsBloc>(context).add(FoodsEventRefreshed());
             },
           )

@@ -57,8 +57,9 @@ class _LoginPageState extends State<LoginPage> {
             print('Login failed');
           } else if(loginState.isSubmitting) {
             print('Logging in');
-          } else if(loginState.isSuccess) {
+          } else if(loginState.isSuccess)  {
             //add event: AuthenticationEventLoggedIn ?
+
             BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationEventLoggedIn());
           }
           return Padding(

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_eat_what_today/events/register_event.dart';
+import 'package:flutter_eat_what_today/models/account.dart';
 import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 import 'package:flutter_eat_what_today/states/register_state.dart';
 import 'package:flutter_eat_what_today/validators/validators.dart';

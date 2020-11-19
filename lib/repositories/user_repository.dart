@@ -1,9 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_eat_what_today/models/account.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserRepository {
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+  final CollectionReference usersRef =
+      FirebaseFirestore.instance.collection('users');
 
   //constructor
 
@@ -52,5 +56,34 @@ class UserRepository {
 
   Future<User> getUser() async {
     return _firebaseAuth.currentUser;
+  }
+
+  Future<void> sendEmailVerification() async {
+    if (!_firebaseAuth.currentUser.emailVerified) {
+      await _firebaseAuth.currentUser.sendEmailVerification();
+    }
+  }
+
+  Future<bool> isExistAccount() async {
+    final user = await getUser();
+    try {
+      await usersRef.doc(user.uid).get();
+      return true;
+    } catch (_) {}
+
+    return false;
+  }
+
+  Future<void> insertUser() async {
+    User user = await getUser();
+    final isExist = await isExistAccount();
+    if (!isExist) {
+      Account account = Account.fromUser(user);
+      usersRef.doc(user.uid).set(account.toJson());
+    }
+  }
+
+  Future<bool> isVerifiedEmail() async {
+    return _firebaseAuth.currentUser.emailVerified;
   }
 }

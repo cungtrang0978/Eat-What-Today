@@ -3,13 +3,17 @@ import 'package:flutter_eat_what_today/blocs/foods_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/login_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/register_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/simple_bloc_observer.dart';
+import 'package:flutter_eat_what_today/blocs/verification_bloc.dart';
 import 'package:flutter_eat_what_today/events/authentication_event.dart';
 import 'package:flutter_eat_what_today/events/foods_event.dart';
+import 'package:flutter_eat_what_today/events/verification_event.dart';
+import 'package:flutter_eat_what_today/models/account.dart';
 import 'package:flutter_eat_what_today/models/food.dart';
 import 'package:flutter_eat_what_today/pages/home_screen.dart';
 import 'package:flutter_eat_what_today/pages/test_calendar_screen.dart';
 import 'package:flutter_eat_what_today/pages/login_page.dart';
 import 'package:flutter_eat_what_today/pages/splash_page.dart';
+import 'package:flutter_eat_what_today/pages/verification_screen.dart';
 import 'package:flutter_eat_what_today/repositories/food_repository.dart';
 import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 import 'package:flutter_eat_what_today/states/authentication_state.dart';
@@ -24,7 +28,8 @@ void main() async {
   await Firebase.initializeApp();
   Bloc.observer = SimpleBlocObserver();
   final UserRepository _userRepository = UserRepository();
-  final FoodRepository _foodRepository = FoodRepository();
+  final FoodRepository _foodRepository =
+      FoodRepository(userRepository: _userRepository);
 
   final multiBlocProvider = MultiBlocProvider(
     providers: [
@@ -45,6 +50,11 @@ void main() async {
         create: (BuildContext context) =>
             RegisterBloc(userRepository: _userRepository),
       ),
+/*      BlocProvider<VerificationBloc>(
+        create: (BuildContext context) =>
+            VerificationBloc(userRepository: _userRepository)
+              ..add(VerificationEventStarted()),
+      )*/
     ],
     child: MyApp(
       userRepository: _userRepository,
@@ -68,9 +78,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, authenticationState) {
+          print(authenticationState.toString());
           if (authenticationState is AuthenticationStateSuccess) {
             return HomeScreen();
-          } else if (authenticationState is AuthenticationStateFailure) {
+          }
+          if (authenticationState is AuthenticationStateFailure) {
             return LoginPage(
               userRepository: userRepository,
             );

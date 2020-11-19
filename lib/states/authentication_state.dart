@@ -15,6 +15,6 @@ class AuthenticationStateSuccess extends AuthenticationState {
   // TODO: implement props
   List<Object> get props => [firebaseUser];
   @override
-  String toString() => 'AuthenticationStateSuccess, email: ${firebaseUser.email}';
+  String toString() => 'AuthenticationStateSuccess, email: ';
 }
 class AuthenticationStateFailure extends AuthenticationState {}
