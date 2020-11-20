@@ -44,6 +44,8 @@ dev_dependencies:
   syncfusion_flutter_calendar: ^18.3.50 #17/11/2020
   table_calendar: ^2.3.0 #17/11/2020
   autocomplete_textfield: ^1.7.3 #18/11/2020
+  modal_bottom_sheet: ^1.0.0+1 #20/11/2020
+
 
 
 # For information on the generic Dart part of this file, see the

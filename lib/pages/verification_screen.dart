@@ -5,6 +5,8 @@ import 'package:flutter_eat_what_today/blocs/authentication_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/verification_bloc.dart';
 import 'package:flutter_eat_what_today/events/verification_event.dart';
+import 'package:flutter_eat_what_today/repositories/food_repository.dart';
+import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 import 'package:flutter_eat_what_today/states/verification_state.dart';
 
 import 'home_screen.dart';
@@ -43,7 +45,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (BuildContext context) => HomeScreen()));
+                    builder: (BuildContext context) => HomeScreen(
+                          foodRepository:
+                              FoodRepository(userRepository: UserRepository()),
+                        )));
             return Center(
               child: Text('Verified'),
             );

@@ -24,8 +24,12 @@ class Food {
   Food.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     imageUrl = json['imageUrl'];
-    createdAt = json['created']==null?null:convertFromTimestamp(json['createdAt']);
-    modifiedAt = json['modifiedAt']==null?null:convertFromTimestamp(json['modifiedAt']);
+    createdAt = json['created'] == null
+        ? null
+        : convertFromTimestamp(json['createdAt']);
+    modifiedAt = json['modifiedAt'] == null
+        ? null
+        : convertFromTimestamp(json['modifiedAt']);
     createdBy = json['createdBy'];
   }
 
@@ -40,8 +44,6 @@ class Food {
     data['createdBy'] = this.createdBy;
     return data;
   }
-
-
 
   DateTime convertFromTimestamp(Timestamp timestamp) {
     return DateTime.fromMicrosecondsSinceEpoch(

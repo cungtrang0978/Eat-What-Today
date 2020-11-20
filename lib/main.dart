@@ -15,12 +15,15 @@ import 'package:flutter_eat_what_today/pages/login_page.dart';
 import 'package:flutter_eat_what_today/pages/splash_page.dart';
 import 'package:flutter_eat_what_today/pages/verification_screen.dart';
 import 'package:flutter_eat_what_today/repositories/food_repository.dart';
+import 'package:flutter_eat_what_today/repositories/meal_repository.dart';
 import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 import 'package:flutter_eat_what_today/states/authentication_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'models/meal.dart';
 
 //In this lesson, we will build User Interface(UI)
 void main() async {
@@ -30,6 +33,8 @@ void main() async {
   final UserRepository _userRepository = UserRepository();
   final FoodRepository _foodRepository =
       FoodRepository(userRepository: _userRepository);
+  final MealRepository _mealRepository =
+      MealRepository(userRepository: _userRepository);
 
   final multiBlocProvider = MultiBlocProvider(
     providers: [
@@ -58,6 +63,8 @@ void main() async {
     ],
     child: MyApp(
       userRepository: _userRepository,
+      foodRepository: _foodRepository,
+      mealRepository: _mealRepository,
     ),
   );
 
@@ -66,9 +73,19 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final UserRepository userRepository;
+  final FoodRepository foodRepository;
+  final MealRepository mealRepository;
 
-  MyApp({Key key, @required this.userRepository})
-      : assert(userRepository != null),
+  MyApp(
+      {Key key,
+      @required this.userRepository,
+      @required this.foodRepository,
+      @required this.mealRepository})
+      : assert(
+          userRepository != null &&
+              foodRepository != null &&
+              mealRepository != null,
+        ),
         super(key: key);
 
   @override
@@ -80,7 +97,9 @@ class MyApp extends StatelessWidget {
         builder: (context, authenticationState) {
           print(authenticationState.toString());
           if (authenticationState is AuthenticationStateSuccess) {
-            return HomeScreen();
+            return HomeScreen(
+              foodRepository: foodRepository,
+            );
           }
           if (authenticationState is AuthenticationStateFailure) {
             return LoginPage(

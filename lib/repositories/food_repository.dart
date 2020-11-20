@@ -36,4 +36,16 @@ class FoodRepository {
     });
     return foods;
   }
+
+  Future<List<Food>> getFoodsByName(String name) async {
+    List<Food> foods = List<Food>();
+    foodsRef.where('name', arrayContains: name).get().then((querySnapshot) {
+      querySnapshot.docs.forEach((foodDoc) {
+        Food food = Food.fromJson(foodDoc.data());
+        food.fid = foodDoc.id;
+        foods.add(food);
+      });
+    });
+    return foods;
+  }
 }

@@ -1,17 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Meal {
-  String id;
-  String foodId;
+  String mid; //meal id
+  String fid; //food id
   DateTime createdAt;
   DateTime modifiedAt;
-  MealType mealType;
+  String createdBy;
   DateTime eatenAt;
+  MealType mealType;
+  List<String> eatenBys;
 
-  Meal({this.id, this.foodId, this.createdAt, this.modifiedAt, this.mealType});
+  Meal(
+      {this.mid,
+      this.fid,
+      this.createdAt,
+      this.modifiedAt,
+      this.createdBy,
+      this.eatenAt,
+      this.mealType,
+      this.eatenBys});
 
   Meal.fromJson(Map<String, dynamic> json) {
-    foodId = json['fid'] ?? '';
+    fid = json['fid'];
     createdAt = json['createdAt'] == null
         ? null
         : convertFromTimestamp(json['createdAt']);
@@ -23,11 +33,44 @@ class Meal {
         : json['mealType'] == 'lunch'
             ? MealType.lunch
             : json['mealType'] == 'dinner' ? MealType.dinner : MealType.other;
+    eatenAt =
+        json['eatenAt'] == null ? null : convertFromTimestamp(json['eatenAt']);
+    createdBy = json['createdBy'];
+    eatenBys = json['eatenBy'] as List;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['fid'] = this.fid;
+    data['createdAt'] =
+        this.createdAt == null ? null : Timestamp.fromDate(this.createdAt);
+    data['modifiedAt'] =
+        this.modifiedAt == null ? null : Timestamp.fromDate(this.modifiedAt);
+    data['createdBy'] = this.createdBy;
+    data['eatenAt'] =
+        this.eatenAt == null ? null : Timestamp.fromDate(this.eatenAt);
+    switch (this.mealType) {
+      case MealType.breakfast:
+        data['mealType'] = 'breakfast';
+        break;
+      case MealType.lunch:
+        data['mealType'] = 'lunch';
+        break;
+      case MealType.dinner:
+        data['mealType'] = 'dinner';
+        break;
+      case MealType.other:
+        data['mealType'] = 'other';
+        break;
+    }
+
+    data['eatenBy'] = this.eatenBys;
+    return data;
   }
 
   @override
   String toString() {
-    return 'Meal{id: $id, foodId: $foodId, createdAt: $createdAt, modifiedAt: $modifiedAt, mealType: $mealType}';
+    return 'Meal{id: $mid, foodId: $fid, createdAt: $createdAt, modifiedAt: $modifiedAt, mealType: $mealType}';
   }
 }
 

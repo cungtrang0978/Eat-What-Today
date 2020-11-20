@@ -6,12 +6,21 @@ import 'package:flutter_eat_what_today/blocs/login_bloc.dart';
 import 'package:flutter_eat_what_today/events/authentication_event.dart';
 import 'package:flutter_eat_what_today/events/login_event.dart';
 import 'package:flutter_eat_what_today/models/account.dart';
+import 'package:flutter_eat_what_today/models/meal.dart';
 import 'package:flutter_eat_what_today/pages/food_addition_screen.dart';
 import 'package:flutter_eat_what_today/pages/foods_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_eat_what_today/pages/meal_addtion_screen.dart';
+import 'package:flutter_eat_what_today/repositories/food_repository.dart';
+import 'package:flutter_eat_what_today/repositories/meal_repository.dart';
+import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 import 'package:flutter_eat_what_today/states/login_state.dart';
 
 class HomeScreen extends StatefulWidget {
+  final FoodRepository foodRepository;
+
+  HomeScreen({@required this.foodRepository}) : assert(foodRepository != null);
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -32,9 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.exit_to_app),
             onPressed: () {
-             BlocProvider.of<AuthenticationBloc>(context)
+              BlocProvider.of<AuthenticationBloc>(context)
                   .add(AuthenticationEventLoggedOut());
-             BlocProvider.of<LoginBloc>(context).add(LoginEventStarted());
+              BlocProvider.of<LoginBloc>(context).add(LoginEventStarted());
             },
           ),
         ],
@@ -51,8 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               FlatButton(
-                child: Text('Add Meal'),
-                onPressed: () {},
+                child: Text('Goto Meal Addition Screen'),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MealAdditionScreen(
+                                foodRepository: widget.foodRepository,
+                              )));
+                },
               ),
             ],
           ),
