@@ -22,6 +22,7 @@ class FoodRepository {
   Future<Food> getFood(String fid) async {
     DocumentSnapshot foodSnapshot = await foodsRef.doc(fid).get();
     final food = Food.fromJson(foodSnapshot.data());
+    food.fid = foodSnapshot.id;
     return food;
   }
 

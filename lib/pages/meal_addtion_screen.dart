@@ -8,10 +8,9 @@ import 'package:flutter_eat_what_today/repositories/meal_repository.dart';
 import 'package:flutter_eat_what_today/repositories/user_repository.dart';
 
 class MealAdditionScreen extends StatefulWidget {
-  final FoodRepository foodRepository;
+  final Meal meal;
 
-  MealAdditionScreen({@required this.foodRepository})
-      : assert(foodRepository != null);
+  MealAdditionScreen({this.meal});
 
   @override
   _MealAdditionScreenState createState() => _MealAdditionScreenState();
@@ -19,12 +18,14 @@ class MealAdditionScreen extends StatefulWidget {
 
 class _MealAdditionScreenState extends State<MealAdditionScreen> {
   TextEditingController foodController = TextEditingController();
-  TextEditingController mealTypeController = TextEditingController();
+  TextEditingController dateController;
 
   GlobalKey<AutoCompleteTextFieldState<Food>> foodKey = new GlobalKey();
   GlobalKey<AutoCompleteTextFieldState<MealType>> mealTypeKey = new GlobalKey();
 
   String selectedFoodId;
+  DateTime selectedDate;
+
   List<MealType> mealTypes = [
     MealType.breakfast,
     MealType.lunch,
@@ -35,12 +36,38 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
 
   List<bool> isSelected = List.generate(4, (_) => false);
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    selectedDate = widget.meal != null ? widget.meal.eatenAt : DateTime.now();
+    dateController =
+        TextEditingController(text: convertDateToString(selectedDate));
+    if(widget.meal!=null ){
+      switch(widget.meal.mealType){
+        case MealType.breakfast:
+          isSelected[0] = true;
+          break;
+        case MealType.lunch:
+          isSelected[1] = true;
+          break;
+        case MealType.dinner:
+          isSelected[2] = true;
+          break;
+        case MealType.other:
+          isSelected[3] = true;
+          break;
+      }
+
+    }
+  }
+
   void _onButtonPressed({BuildContext context}) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
           return FutureBuilder<List<Food>>(
-            future: widget.foodRepository.getFoods(),
+            future: FoodRepository(userRepository: UserRepository()).getFoods(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Center(
@@ -57,7 +84,7 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
                         child: ListTile(
                           title: Text(food.name),
                         ),
-                        onTap: (){
+                        onTap: () {
                           print(food.name);
                           setState(() {
                             foodController.text = food.name;
@@ -73,6 +100,19 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
             },
           );
         });
+  }
+
+  DateTime calculateDateTime(DateTime dateTime, int plusIndex) {
+    int dayToMiliseconds = plusIndex * 24 * 60 * 60 * 1000;
+    return DateTime.fromMillisecondsSinceEpoch(
+        dateTime.millisecondsSinceEpoch + dayToMiliseconds);
+  }
+
+  String convertDateToString(DateTime dateTime) {
+    int day = dateTime.day;
+    int month = dateTime.month;
+    int year = dateTime.year;
+    return '${weekdayToString(dateTime)},  $day/$month/$year';
   }
 
   @override
@@ -108,12 +148,9 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
         padding: EdgeInsets.all(10),
         child: Column(
           children: [
-
             TextField(
               controller: foodController,
-              decoration: InputDecoration(
-                hintText: 'Choose Food'
-              ),
+              decoration: InputDecoration(hintText: 'Choose Food'),
               onTap: () {
                 _onButtonPressed(context: context);
               },
@@ -148,20 +185,49 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
                 scrollDirection: Axis.horizontal,
               ),
             ),
+            SizedBox(
+              height: 10,
+            ),
+            TextField(
+              readOnly: true,
+              controller: dateController,
+              onTap: () {
+                showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(selectedDate.year - 2),
+                        lastDate: DateTime(selectedDate.year + 2))
+                    .then((date) {
+                  setState(() {
+                    dateController.text = convertDateToString(date);
+                    setState(() {
+                      selectedDate = date;
+                    });
+                  });
+                });
+                // showTimePicker(context: context, initialTime: TimeOfDay.now());
+              },
+            ),
             RaisedButton(
               child: Text('Add'),
               onPressed: () {
-                print('add');
                 MealType mealType;
                 for (int i = 0; i < isSelected.length; i++) {
                   if (isSelected[i]) {
                     mealType = mealTypes[i];
                   }
                 }
-                if (selectedFoodId.isNotEmpty && mealType != null) {
-                  final meal =
-                      Meal(fid: selectedFoodId, mealType: mealType);
-                  MealRepository(userRepository: UserRepository())
+                if (selectedFoodId != null && mealType != null) {
+                  print('add');
+                  final meal = Meal(
+                      fid: selectedFoodId,
+                      mealType: mealType,
+                      eatenAt: selectedDate);
+                  final userRepository = UserRepository();
+                  MealRepository(
+                          userRepository: userRepository,
+                          foodRepository:
+                              FoodRepository(userRepository: userRepository))
                       .insertMeal(meal);
                 }
               },
@@ -217,5 +283,32 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
         });
       },
     );
+  }
+
+  String weekdayToString(DateTime dateTime) {
+    switch (dateTime.weekday) {
+      case 1:
+        return 'Monday';
+        break;
+      case 2:
+        return 'Tuesday';
+        break;
+      case 3:
+        return 'Wednesday';
+        break;
+      case 4:
+        return 'Thursday';
+        break;
+      case 5:
+        return 'Friday';
+        break;
+      case 6:
+        return 'Saturday';
+        break;
+      case 7:
+        return 'Sunday';
+        break;
+    }
+    return '';
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_eat_what_today/blocs/authentication_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/foods_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/login_bloc.dart';
+import 'package:flutter_eat_what_today/blocs/meals_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/register_bloc.dart';
 import 'package:flutter_eat_what_today/blocs/simple_bloc_observer.dart';
 import 'package:flutter_eat_what_today/blocs/verification_bloc.dart';
@@ -33,8 +34,8 @@ void main() async {
   final UserRepository _userRepository = UserRepository();
   final FoodRepository _foodRepository =
       FoodRepository(userRepository: _userRepository);
-  final MealRepository _mealRepository =
-      MealRepository(userRepository: _userRepository);
+  final MealRepository _mealRepository = MealRepository(
+      userRepository: _userRepository, foodRepository: _foodRepository);
 
   final multiBlocProvider = MultiBlocProvider(
     providers: [
@@ -55,6 +56,10 @@ void main() async {
         create: (BuildContext context) =>
             RegisterBloc(userRepository: _userRepository),
       ),
+      BlocProvider<MealsBloc>(
+        create: (BuildContext context) =>
+            MealsBloc(mealRepository: _mealRepository),
+      )
 /*      BlocProvider<VerificationBloc>(
         create: (BuildContext context) =>
             VerificationBloc(userRepository: _userRepository)
@@ -97,9 +102,7 @@ class MyApp extends StatelessWidget {
         builder: (context, authenticationState) {
           print(authenticationState.toString());
           if (authenticationState is AuthenticationStateSuccess) {
-            return HomeScreen(
-              foodRepository: foodRepository,
-            );
+            return HomeScreen();
           }
           if (authenticationState is AuthenticationStateFailure) {
             return LoginPage(

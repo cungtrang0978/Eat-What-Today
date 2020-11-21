@@ -24,7 +24,7 @@ class Food {
   Food.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     imageUrl = json['imageUrl'];
-    createdAt = json['created'] == null
+    createdAt = json['createdAt'] == null
         ? null
         : convertFromTimestamp(json['createdAt']);
     modifiedAt = json['modifiedAt'] == null

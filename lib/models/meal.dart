@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_eat_what_today/models/food.dart';
 
 class Meal {
   String mid; //meal id
@@ -8,7 +9,7 @@ class Meal {
   String createdBy;
   DateTime eatenAt;
   MealType mealType;
-  List<String> eatenBys;
+  List<dynamic> eatenBys;
 
   Meal(
       {this.mid,
@@ -36,12 +37,13 @@ class Meal {
     eatenAt =
         json['eatenAt'] == null ? null : convertFromTimestamp(json['eatenAt']);
     createdBy = json['createdBy'];
-    eatenBys = json['eatenBy'] as List;
+    eatenBys = json['eatenBy'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['fid'] = this.fid;
+    // data['fid'] = this.food.fid;
     data['createdAt'] =
         this.createdAt == null ? null : Timestamp.fromDate(this.createdAt);
     data['modifiedAt'] =
@@ -68,9 +70,28 @@ class Meal {
     return data;
   }
 
+
   @override
   String toString() {
-    return 'Meal{id: $mid, foodId: $fid, createdAt: $createdAt, modifiedAt: $modifiedAt, mealType: $mealType}';
+    return 'Meal{mid: $mid, fid: $fid, createdAt: $createdAt, modifiedAt: $modifiedAt, createdBy: $createdBy, eatenAt: $eatenAt, mealType: $mealType, eatenBys: $eatenBys}';
+  }
+
+  String mealTypeToString(){
+    switch(mealType){
+      case MealType.breakfast:
+        return 'breakfast';
+        break;
+      case MealType.lunch:
+        return 'lunch';
+        break;
+      case MealType.dinner:
+        return 'dinner';
+        break;
+      case MealType.other:
+        return 'other';
+        break;
+    }
+    return '';
   }
 }
 

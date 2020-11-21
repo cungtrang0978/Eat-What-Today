@@ -45,10 +45,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (BuildContext context) => HomeScreen(
-                          foodRepository:
-                              FoodRepository(userRepository: UserRepository()),
-                        )));
+                    builder: (BuildContext context) => HomeScreen()));
             return Center(
               child: Text('Verified'),
             );

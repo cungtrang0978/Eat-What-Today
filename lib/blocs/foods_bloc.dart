@@ -18,7 +18,6 @@ class FoodsBloc extends Bloc<FoodsEvent, FoodsState> {
       yield FoodsStateLoading();
       try {
         final List<Food> foods = await foodRepository.getFoods();
-        print(foods);
         yield FoodsStateSuccess(foods: foods);
       } catch (exception) {
         yield FoodsStateFailure();
