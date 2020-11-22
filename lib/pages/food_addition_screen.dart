@@ -99,6 +99,7 @@ class _FoodAdditionScreenState extends State<FoodAdditionScreen> {
                 BlocProvider.of<FoodsBloc>(context)
                     .foodRepository
                     .insertFood(food);
+                Navigator.of(context).pop(true);
               }
               print("insert food");
               // FoodRepository().getFoods();

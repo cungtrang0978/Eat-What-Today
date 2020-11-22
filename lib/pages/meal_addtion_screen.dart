@@ -1,16 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_eat_what_today/blocs/foods_bloc.dart';
+import 'package:flutter_eat_what_today/blocs/meals_bloc.dart';
 import 'package:flutter_eat_what_today/models/food.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:flutter_eat_what_today/models/meal.dart';
 import 'package:flutter_eat_what_today/repositories/food_repository.dart';
 import 'package:flutter_eat_what_today/repositories/meal_repository.dart';
 import 'package:flutter_eat_what_today/repositories/user_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MealAdditionScreen extends StatefulWidget {
   final Meal meal;
+  final Food food;
 
-  MealAdditionScreen({this.meal});
+  MealAdditionScreen({this.meal, this.food});
 
   @override
   _MealAdditionScreenState createState() => _MealAdditionScreenState();
@@ -23,9 +27,10 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
   GlobalKey<AutoCompleteTextFieldState<Food>> foodKey = new GlobalKey();
   GlobalKey<AutoCompleteTextFieldState<MealType>> mealTypeKey = new GlobalKey();
 
+  MealsBloc mealsBloc;
+
   String selectedFoodId;
   DateTime selectedDate;
-
   List<MealType> mealTypes = [
     MealType.breakfast,
     MealType.lunch,
@@ -40,11 +45,14 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    mealsBloc = BlocProvider.of<MealsBloc>(context);
+
     selectedDate = widget.meal != null ? widget.meal.eatenAt : DateTime.now();
+
     dateController =
         TextEditingController(text: convertDateToString(selectedDate));
-    if(widget.meal!=null ){
-      switch(widget.meal.mealType){
+    if (widget.meal != null) {
+      switch (widget.meal.mealType) {
         case MealType.breakfast:
           isSelected[0] = true;
           break;
@@ -58,11 +66,10 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
           isSelected[3] = true;
           break;
       }
-
     }
   }
 
-  void _onButtonPressed({BuildContext context}) {
+  void _onDateButtonPressed({BuildContext context}) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -148,11 +155,48 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
         padding: EdgeInsets.all(10),
         child: Column(
           children: [
+            /*(widget.meal != null && widget.meal.fid != null)
+                ? FutureBuilder<Food>(
+                    future: mealsBloc.mealRepository.foodRepository
+                        .getFood(widget.meal.fid),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text(snapshot.error.toString());
+                      }
+                      if (snapshot.hasData) {
+                        foodController.text = snapshot.data.name;
+                        return TextField(
+                          controller: foodController,
+                          decoration: InputDecoration(hintText: 'Choose Food'),
+                          onTap: () {
+                            _onDateButtonPressed(context: context);
+                          },
+                          readOnly: true,
+                        );
+                      }
+                      return TextField(
+                        controller: foodController,
+                        decoration: InputDecoration(hintText: 'Choose Food'),
+                        onTap: () {
+                          _onDateButtonPressed(context: context);
+                        },
+                        readOnly: true,
+                      );
+                    },
+                  )
+                : TextField(
+                    controller: foodController,
+                    decoration: InputDecoration(hintText: 'Choose Food'),
+                    onTap: () {
+                      _onDateButtonPressed(context: context);
+                    },
+                    readOnly: true,
+                  ),*/
             TextField(
               controller: foodController,
               decoration: InputDecoration(hintText: 'Choose Food'),
               onTap: () {
-                _onButtonPressed(context: context);
+                _onDateButtonPressed(context: context);
               },
               readOnly: true,
             ),
@@ -218,17 +262,22 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
                   }
                 }
                 if (selectedFoodId != null && mealType != null) {
-                  print('add');
-                  final meal = Meal(
-                      fid: selectedFoodId,
-                      mealType: mealType,
-                      eatenAt: selectedDate);
-                  final userRepository = UserRepository();
-                  MealRepository(
-                          userRepository: userRepository,
-                          foodRepository:
-                              FoodRepository(userRepository: userRepository))
-                      .insertMeal(meal);
+                  if (widget.meal.mid == null) {
+                    print('insert meal');
+                    final meal = Meal(
+                        fid: selectedFoodId,
+                        mealType: mealType,
+                        eatenAt: selectedDate);
+                    mealsBloc.mealRepository.insertMeal(meal);
+                  } else {
+                    final meal = widget.meal;
+                    meal.fid = selectedFoodId;
+                    meal.mealType = mealType;
+                    meal.modifiedAt = DateTime.now();
+                    print(meal);
+                    mealsBloc.mealRepository.updateMeal(meal);
+                  }
+                  Navigator.of(context).pop(true);
                 }
               },
             )

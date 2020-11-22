@@ -14,6 +14,7 @@ import 'package:flutter_eat_what_today/models/meal.dart';
 import 'package:flutter_eat_what_today/pages/foods_screen.dart';
 
 import 'package:flutter_eat_what_today/pages/meal_addtion_screen.dart';
+import 'package:flutter_eat_what_today/pages/settings_screen.dart';
 import 'package:flutter_eat_what_today/repositories/food_repository.dart';
 import 'package:flutter_eat_what_today/repositories/meal_repository.dart';
 import 'package:flutter_eat_what_today/repositories/user_repository.dart';
@@ -79,11 +80,12 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Home Screen'),
         actions: [
           IconButton(
-            icon: Icon(Icons.exit_to_app),
+            icon: Icon(Icons.settings),
             onPressed: () {
-              BlocProvider.of<AuthenticationBloc>(context)
-                  .add(AuthenticationEventLoggedOut());
-              BlocProvider.of<LoginBloc>(context).add(LoginEventStarted());
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => SettingsScreen()));
             },
           ),
         ],
@@ -162,6 +164,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         plusIndex = 2;
                         break;
                     }
+                    final color = index % 2 == 0
+                        ? Colors.greenAccent[100]
+                        : Colors.redAccent[100];
                     final date = calculateDateTime(now, plusIndex);
                     List<Widget> cellChildren = List<Widget>();
                     List<Meal> dateMeals = meals.where((meal) {
@@ -169,12 +174,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     }).toList();
 
                     //insert top cells
-                    cellChildren.add(staticMealCell(weekdayToString(date)));
+                    cellChildren.add(staticMealCell(weekdayToString(date),
+                        date: date,
+                        color: index % 2 == 0
+                            ? Colors.greenAccent[100]
+                            : Colors.redAccent[100]));
 
                     //method insert empty mealCell
                     void _insertEmptyCell(MealType mealType) {
-                      cellChildren.add(
-                          mealCell(Meal(eatenAt: date, mealType: mealType)));
+                      cellChildren.add(mealCell(
+                          Meal(eatenAt: date, mealType: mealType),
+                          color: color));
                     }
 
                     if (dateMeals.isEmpty) {
@@ -192,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 (meal) => meal.mealType == MealType.breakfast)
                             .toList()
                             .first;
-                        cellChildren.add(mealCell(meal));
+                        cellChildren.add(mealCell(meal, color: color));
                       } else {
                         _insertEmptyCell(MealType.breakfast);
                       }
@@ -206,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             .where((meal) => meal.mealType == MealType.lunch)
                             .toList()
                             .first;
-                        cellChildren.add(mealCell(meal));
+                        cellChildren.add(mealCell(meal, color: color));
                       } else {
                         _insertEmptyCell(MealType.lunch);
                       }
@@ -220,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             .where((meal) => meal.mealType == MealType.dinner)
                             .toList()
                             .first;
-                        cellChildren.add(mealCell(meal));
+                        cellChildren.add(mealCell(meal, color: color));
                       } else {
                         _insertEmptyCell(MealType.dinner);
                       }
@@ -261,7 +271,79 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget mealCell(Meal meal) {
+  Widget mealCell2(Meal meal, {@required Color color}) {
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.middle,
+      child: meal.fid != null
+          ? FutureBuilder<Food>(
+        future: mealsBloc.mealRepository.foodRepository.getFood(meal.fid),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print(snapshot.error.toString());
+            return Text(snapshot.error.toString());
+          }
+          if (snapshot.hasData) {
+            final food = snapshot.data;
+            return GestureDetector(
+              child: Container(
+                width: 150,
+                constraints: BoxConstraints(
+                    minHeight: 50, minWidth: double.maxFinite),
+                // padding: EdgeInsets.all(15),
+                alignment: Alignment.center,
+                color: color,
+                child: Container(
+                  constraints: BoxConstraints(minHeight: 50),
+                  alignment: Alignment.center,
+                  child: Text(food.name),
+                ),
+              ),
+              onTap: () async {
+                // print(meal);
+                bool isSuccessfulAddition = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MealAdditionScreen(
+                          meal: meal,
+                          food: food,
+                        ))) ??
+                    false;
+                if (isSuccessfulAddition) {
+                  mealsBloc.add(MealsEventRefreshed());
+                }
+              },
+            );
+          } else {
+            return Text('');
+          }
+        },
+      )
+          : GestureDetector(
+        child: Container(
+          constraints:
+          BoxConstraints(minHeight: 50, minWidth: double.maxFinite),
+          width: 150,
+          child: Text(''),
+        ),
+        onTap: () async {
+          // print(meal);
+          bool isSuccessfulAddition = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MealAdditionScreen(
+                    meal: meal,
+                  ))) ??
+              false;
+          if (isSuccessfulAddition) {
+            mealsBloc.add(MealsEventRefreshed());
+          }
+        },
+      ),
+    );
+  }
+
+  Widget mealCell(Meal meal, {@required Color color}) {
+
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: GestureDetector(
@@ -271,6 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
               BoxConstraints(minHeight: 50, minWidth: double.maxFinite),
           // padding: EdgeInsets.all(15),
           alignment: Alignment.center,
+          color: color,
           child: meal.fid != null
               ? FutureBuilder<Food>(
                   future:
@@ -293,32 +376,55 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 )
               : Container(
-            constraints: BoxConstraints(minHeight: 50),
+                  constraints: BoxConstraints(minHeight: 50),
                   width: double.maxFinite,
                   child: Text(''),
                 ),
         ),
-        onTap: () {
+        onTap: () async {
           print(meal);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MealAdditionScreen(
-                        meal: meal,
-                      )));
+          bool isSuccessfulAddition = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MealAdditionScreen(
+                            meal: meal,
+                          ))) ??
+              false;
+          if (isSuccessfulAddition) {
+            mealsBloc.add(MealsEventRefreshed());
+          }
         },
       ),
     );
   }
 
-  Widget staticMealCell(String label) {
+  String convertDateToString(DateTime dateTime) {
+    int day = dateTime.day;
+    int month = dateTime.month;
+    int year = dateTime.year;
+    return '$day/$month/$year';
+  }
+
+  Widget staticMealCell(String label, {DateTime date, Color color}) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: Center(
-        child: Padding(
+        child: Container(
+          color: color,
           padding: EdgeInsets.all(10),
           child: GestureDetector(
-            child: Text(label),
+            child: Column(
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                if (date != null) Text(convertDateToString(date)),
+              ],
+            ),
           ),
         ),
       ),

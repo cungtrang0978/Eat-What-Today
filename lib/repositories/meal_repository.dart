@@ -43,4 +43,12 @@ class MealRepository {
     });
     return meals;
   }
+
+  Future<void> updateMeal(Meal meal) async {
+    mealsRef
+        .doc(meal.mid)
+        .update(meal.toJson())
+        .then((value) => print("Meal Updated"))
+        .catchError((error) => print("Failed to update meal: $error"));
+  }
 }

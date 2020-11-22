@@ -30,16 +30,18 @@ class _FoodsScreenState extends State<FoodsScreen> {
         title: Text('FoodsScreen'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => FoodAdditionScreen())),
-          ),
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              BlocProvider.of<FoodsBloc>(context).add(FoodsEventRefreshed());
-            },
-          )
+              icon: Icon(Icons.add),
+              onPressed: () async {
+                final isSuccessfulAddition = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FoodAdditionScreen())) ??
+                    false;
+                if (isSuccessfulAddition) {
+                  BlocProvider.of<FoodsBloc>(context)
+                      .add(FoodsEventRefreshed());
+                }
+              }),
         ],
       ),
       body: Container(
