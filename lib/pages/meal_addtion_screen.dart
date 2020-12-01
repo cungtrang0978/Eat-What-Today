@@ -242,12 +242,13 @@ class _MealAdditionScreenState extends State<MealAdditionScreen> {
                         firstDate: DateTime(selectedDate.year - 2),
                         lastDate: DateTime(selectedDate.year + 2))
                     .then((date) {
-                  setState(() {
-                    dateController.text = convertDateToString(date);
+                  if (date != null)
                     setState(() {
-                      selectedDate = date;
+                      dateController.text = convertDateToString(date);
+                      setState(() {
+                        selectedDate = date;
+                      });
                     });
-                  });
                 });
                 // showTimePicker(context: context, initialTime: TimeOfDay.now());
               },
