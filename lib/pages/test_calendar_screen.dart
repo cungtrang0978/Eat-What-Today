@@ -89,7 +89,7 @@ class _TestCalendarScreenState extends State<TestCalendarScreen> with TickerProv
     _calendarController = CalendarController();
 
     _animationController = AnimationController(
-      vsync: this,
+      value: this,
       duration: const Duration(milliseconds: 400),
     );
 
